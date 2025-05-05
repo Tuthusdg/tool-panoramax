@@ -100,7 +100,6 @@ def update_exif(photo_filename, infos):
 
 def main():
     points = parse_geojson("output.geojson")
-    os.makedirs("unchanged", exist_ok=True)
 
     images_to_process = os.listdir("img_to_be_changed")
     images_to_process = [
