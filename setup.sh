@@ -17,7 +17,7 @@ step_done() {
 
 # Étape 1 : Créer un environnement virtuel
 step "Création de l'environnement virtuel"
-python3 -m venv ~/Desktop/tool-panoramax > /dev/null 2>&1
+python3 -m venv ./tool-panoramax > /dev/null 2>&1
 if [ $? -ne 0 ]; then
     echo "[✘] Erreur lors de la création de l'environnement virtuel"
     return 1
@@ -26,7 +26,7 @@ step_done "Environnement virtuel créé"
 
 # Étape 2 : Activation de l'environnement
 step "Activation de l'environnement"
-source ~/Desktop/tool-panoramax/bin/activate
+source ./tool-panoramax/bin/activate
 step_done "Environnement activé"
 
 # Étape 3 : Mise à jour de pip
