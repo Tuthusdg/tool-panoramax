@@ -46,5 +46,6 @@ for pkg in "${PACKAGES[@]}"; do
     fi
     step_done "$pkg installé"
 done
-
+mkdir kml_here
+mkdir img_to_be_changed
 echo -e "\n✅ Installation terminée avec succès. L’environnement est actif."
