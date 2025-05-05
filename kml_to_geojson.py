@@ -1,68 +1,73 @@
 import xml.etree.ElementTree as ET
 import json
 import re
+import glob
+import os
+
 
 def converter_kml():
-    with open("ton_fichier.kml", "r", encoding="utf-8") as f:
+    # Chemin vers le dossier contenant les fichiers KML
+    kml_folder = "kml_here/"
+    kml_files = glob.glob(os.path.join(kml_folder, "*.kml"))
+
+    if not kml_files:
+        print("❌ Aucun fichier .kml trouvé dans le dossier 'kml_here/'.")
+        return
+
+    # Si un seul fichier trouvé, l'utiliser automatiquement
+    if len(kml_files) == 1:
+        filename = kml_files[0]
+        print(f"🔍 Fichier détecté : {filename}")
+    else:
+        print("📂 Plusieurs fichiers .kml trouvés dans 'kml_here/':")
+        for i, file in enumerate(kml_files, 1):
+            print(f"{i}. {os.path.basename(file)}")
+        choice = int(input("Entrez le numéro du fichier à utiliser : "))
+        filename = kml_files[choice - 1]
+
+    with open(filename, "r", encoding="utf-8") as f:
         tree = ET.parse(f)
 
     root = tree.getroot()
 
-    # Namespace KML standard
-    ns = {'kml': "http://www.opengis.net/kml/2.2"}
-
-    # Trouver tous les Placemarks
-    placemarks = root.findall('.//kml:Placemark', ns)
+    ns = {"kml": "http://www.opengis.net/kml/2.2"}
+    placemarks = root.findall(".//kml:Placemark", ns)
 
     features = []
 
     for placemark in placemarks:
-        # Chercher la description (timestamp)
-        description_elem = placemark.find('kml:description', ns)
+        description_elem = placemark.find("kml:description", ns)
         if description_elem is None:
             continue
 
         description_text = description_elem.text or ""
-
-        # Utiliser une regex pour extraire la date/heure
-        match = re.search(r'Time:\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+)', description_text)
+        match = re.search(
+            r"Time:\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+)", description_text
+        )
         if not match:
-            continue  # Pas de timestamp trouvé
+            continue
 
         timestamp = match.group(1)
 
-        # Chercher les coordonnées
-        coord_elem = placemark.find('.//kml:Point/kml:coordinates', ns)
+        coord_elem = placemark.find(".//kml:Point/kml:coordinates", ns)
         if coord_elem is None:
             continue
 
         coord_text = coord_elem.text.strip()
-        lon, lat, *alt = map(float, coord_text.split(','))
-
-        # Altitude peut ne pas exister
+        lon, lat, *alt = map(float, coord_text.split(","))
         alt_value = alt[0] if alt else 0.0
 
-        # Créer le Feature GeoJSON
         feature = {
             "type": "Feature",
-            "properties": {
-                "timestamp": timestamp
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": [lon, lat, alt_value]
-            }
+            "properties": {"timestamp": timestamp},
+            "geometry": {"type": "Point", "coordinates": [lon, lat, alt_value]},
         }
         features.append(feature)
 
-    # Génération du GeoJSON
-    geojson = {
-        "type": "FeatureCollection",
-        "features": features
-    }
+    geojson = {"type": "FeatureCollection", "features": features}
 
-    # Sauvegarde dans un fichier
-    with open("output.geojson", "w", encoding="utf-8") as f:
+    output_file = "output.geojson"
+    with open(output_file, "w", encoding="utf-8") as f:
         json.dump(geojson, f, indent=2)
 
-    print("✅ Conversion terminée ! Fichier : output.geojson")
+    print(f"✅ Conversion terminée ! Fichier : {output_file}")
