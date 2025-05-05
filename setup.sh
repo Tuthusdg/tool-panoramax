@@ -35,7 +35,7 @@ pip install --upgrade pip > /dev/null 2>&1
 step_done "pip mis à jour"
 
 # Étape 4 : Installation des paquets
-PACKAGES=("pillow" "gpsphoto" "geopandas" "pandas" "exifread" "piexif" "tqdm")
+PACKAGES=("pillow" "gpsphoto" "geopandas" "pandas" "exifread" "piexif" "tqdm" "panoramax_cli")
 
 for pkg in "${PACKAGES[@]}"; do
     step "Installation de $pkg"
