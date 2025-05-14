@@ -71,3 +71,7 @@ def converter_kml():
         json.dump(geojson, f, indent=2)
 
     print(f"✅ Conversion terminée ! Fichier : {output_file}")
+
+
+if __name__ == "__main__":
+    converter_kml()

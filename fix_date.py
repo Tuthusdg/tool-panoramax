@@ -1,52 +1,25 @@
-import subprocess
-import piexif
 import os
+import re
+import time
 from datetime import datetime
 
-def get_timestamp_from_insv(insv_file):
-    # Using piexif to extract the timestamp from the INSV file metadata
-    exif_dict = piexif.load(insv_file)
-    
-    # The DateTimeOriginal is stored under the '0th' IFD in EXIF metadata
-    datetime_str = exif_dict["Exif"][piexif.ExifIFD.DateTimeOriginal].decode("utf-8")
-    
-    # Convert to datetime object
-    timestamp = datetime.strptime(datetime_str, '%Y:%m:%d %H:%M:%S')
-    return timestamp
+VIDEO_DIR = "vids"
+filename_pattern = re.compile(r"VID_(\d{8})_(\d{6})")
 
-def add_timestamp_to_video(mp4_file, timestamp):
-    # Format the timestamp to use in the filename or as text
-    timestamp_str = timestamp.strftime('%Y-%m-%d %H:%M:%S')
+for filename in os.listdir(VIDEO_DIR):
+    if filename.endswith(".mp4"):
+        match = filename_pattern.match(filename)
+        if match:
+            date_str, time_str = match.groups()
+            datetime_str = f"{date_str}{time_str}"
+            dt = datetime.strptime(datetime_str, "%Y%m%d%H%M%S")
 
-    # Command to add timestamp as metadata to mp4 file (using ffmpeg)
-    output_file = f"output_{os.path.basename(mp4_file)}"
-    command = [
-        'ffmpeg',
-        '-i', mp4_file,
-        '-metadata', f'creation_time={timestamp_str}',
-        '-codec', 'copy',
-        output_file
-    ]
+            timestamp = dt.timestamp()
+            filepath = os.path.join(VIDEO_DIR, filename)
 
-    # Run the ffmpeg command
-    subprocess.run(command, check=True)
-    print(f"Timestamp added to video. Output saved as: {output_file}")
-    return output_file
+            # Modification du mtime et atime du fichier
+            os.utime(filepath, (timestamp, timestamp))
 
-def main():
-    # Input files
-    insv_file = 'vids/vid03.insv'  # Replace with your .insv file path
-    mp4_file = 'vids/vid03.mp4'    # Replace with your .mp4 file path
-
-    # Extract timestamp from INSV file
-    timestamp = get_timestamp_from_insv(insv_file)
-    print(f"Timestamp from INSV file: {timestamp}")
-
-    # Add timestamp to MP4 video file
-    add_timestamp_to_video(mp4_file, timestamp)
-
-if __name__ == '__main__':
-    main()
-
-
-"modif"
+            print(f"[OK] {filename} → mtime/atime mis à {dt.isoformat()}")
+        else:
+            print(f"[SKIP] Format de nom incorrect : {filename}")

@@ -1,8 +1,6 @@
 import cv2
 import os
 import glob
-import subprocess
-import json
 from datetime import timedelta, datetime
 import re
 from tqdm import tqdm
@@ -39,7 +37,7 @@ def save_image_with_exif(image_path, frame, datetime_obj):
 
 
 def extract_all_real_photos(input_dir):
-    output_dir = os.path.join(".", "images_sortie")
+    output_dir = os.path.join(".", "img_to_b_changed")
     os.makedirs(output_dir, exist_ok=True)
 
     video_files = []
