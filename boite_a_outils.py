@@ -1,9 +1,12 @@
 import change_gps_2
 import change_gps_vid
+import finale.constants
+import finale.main
 import kml_to_geojson
 import subprocess as sp
 import sys
 import img_extractor
+import finale
 
 CAMERA = ""
 
@@ -109,9 +112,9 @@ def menu_go_pro():
         print("1- Mode auto")
         print("2- Ajuster les coordonnées GPS")
         print("3- Ajouter un logo")
-        print("4- Retour")
-        print("5- Quitter")
-
+        print("4- Corriger l'inclinaison(v.BETA)")
+        print("5- Retour")
+        print("6- Quitter")
         choix = get_user_choice("Votre choix: ", [1, 2, 3, 4, 5])
 
         if choix == 1:
@@ -121,8 +124,10 @@ def menu_go_pro():
         elif choix == 3:
             add_logo()
         elif choix == 4:
-            return
+            pass
         elif choix == 5:
+            return
+        else:
             sys.exit()
 
 
@@ -227,20 +232,35 @@ def adapt_meta_insta():
     sp.run(["./meta_insta.sh", paths[choix]])
 
 
+def corrige_inclinaison():
+    print("\n--- CORRECTION INCLINAISON ---")
+    print("1- img_to_be_changed/")
+    print("2- img_to_be_changed/changed/")
+    choix = get_user_choice("Choisissez le dossier: ", [1, 2])
+    path = "img_to_be_changed/" if choix == 1 else "img_to_be_changed/changed/"
+    finale.main(path)
+
+
 def mode_auto():
     global CAMERA
     print("\n--- MODE AUTO ---")
     print("Ce mode effectue automatiquement :")
     print("  - Changement des coordonnées GPS")
+    print("  - Correction d'inclinaison")
     print("  - Ajout de logo")
     print("  - Modification des métadonnées (Insta360 uniquement)")
     print("  - Upload vers Panoramax")
 
     kml_to_geojson.converter_kml()
     change_gps_2.main()
-
+    finale.main("img_to_be_changed/changed/")
     meta_path = (
-        "img_logo/" if CAMERA == "Insta360 one x2" else "img_to_be_changed/changed/"
+        "img_logo/"
+        if CAMERA == "Insta360 one x2"
+        else f"img_to_be_changed/changed/{finale.constants.CERTAIN_DIR}"
+    )
+    print(
+        "ATTENTION LES IMAGES ETANT CLASSIFIE COMME INCERTAINE NE SERONT PAS TRAITÉ PAR LE TRAITEMENT CONSACRÉ A INSTA360 ET NE SERONS PAS PUSH SUR PANORAMAX"
     )
     sp.run(["./meta_insta.sh", meta_path])
     sp.run(["./script_logo_insta.sh", "img_to_be_changed/changed/"])
