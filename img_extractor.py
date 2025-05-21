@@ -37,9 +37,6 @@ def save_image_with_exif(image_path, frame, datetime_obj):
 
 
 def extract_all_real_photos(input_dir):
-    output_dir = os.path.join(".", "img_to_b_changed")
-    os.makedirs(output_dir, exist_ok=True)
-
     video_files = []
     for ext in ("*.MP4", "*.mp4", "*.360", "*.LRV"):
         video_files.extend(glob.glob(os.path.join(input_dir, ext)))
