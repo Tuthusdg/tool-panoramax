@@ -1,12 +1,13 @@
+import os
+import subprocess as sp
+import sys
+
 import change_gps_2
 import change_gps_vid
 import finale.constants
 import finale.main
-import kml_to_geojson
-import subprocess as sp
-import sys
 import img_extractor
-import finale
+import kml_to_geojson
 
 CAMERA = ""
 
@@ -81,20 +82,11 @@ def menu():
 
 def push_panoramax():
     print("\n--- Upload Panoramax ---")
-    print("1- img_to_be_changed/")
-    print("2- img_to_be_changed/changed/")
-    print("3- img_logo/")
-    print("4- Retour")
-
-    choix = get_user_choice("Choix du chemin photo: ", [1, 2, 3, 4])
-    paths = {
-        1: "img_to_be_changed/",
-        2: "img_to_be_changed/changed/",
-        3: "img_logo/",
-    }
-
-    path = paths.get(choix)
-    if path:
+    path = input("Entrez le chemin où sont situées vos photos : ").strip()
+    if not os.path.exists(path):
+        print("Chemin invalide. Veuillez réessayer.")
+        return
+    try:
         sp.run(
             [
                 "panoramax_cli",
@@ -102,8 +94,11 @@ def push_panoramax():
                 "--api-url",
                 "https://panoramax.openstreetmap.fr/",
                 path,
-            ]
+            ],
+            check=True
         )
+    except Exception as e:
+        print(f"Erreur lors de l'upload : {e}")
 
 
 def menu_go_pro():
@@ -112,7 +107,7 @@ def menu_go_pro():
         print("1- Mode auto")
         print("2- Ajuster les coordonnées GPS")
         print("3- Ajouter un logo")
-        print("4- Corriger l'inclinaison(v.BETA)")
+        print("4- Corriger l'inclinaison (v.BETA)")
         print("5- Retour")
         print("6- Quitter")
         choix = get_user_choice("Votre choix: ", [1, 2, 3, 4, 5, 6])
@@ -182,13 +177,8 @@ def menu_insta():
                 if choix == 1:
                     mode_auto_vid()
                 elif choix == 2:
-                    print(
-                        "!!! L'algorithme utilise le nom du fichier vidéo. Ne le modifiez pas !!!"
-                    )
-                    print(
-                        "Assurez-vous d’avoir placé les vidéos dans le dossier 'vids/'."
-                    )
-
+                    print("!!! L'algorithme utilise le nom du fichier vidéo. Ne le modifiez pas !!!")
+                    print("Assurez-vous d’avoir placé les vidéos dans le dossier 'vids/'.")
                     y_n = input("Avez-vous respecté les prérequis ? [y/n] : ").lower()
                     if y_n == "y":
                         img_extractor.extract_all_real_photos("vids/")
@@ -207,38 +197,38 @@ def menu_insta():
 
 
 def add_logo():
-    print("\n--- AJOUT DE LOGO ---")
-    print("1- img_to_be_changed/")
-    print("2- img_to_be_changed/changed/")
-
-    choix = get_user_choice("Choisissez le dossier: ", [1, 2])
-    path = "img_to_be_changed/" if choix == 1 else "img_to_be_changed/changed/"
-    sp.run(["./script_logo_insta.sh", path])
+    path = input("Entrez le chemin où sont situées vos photos : ").strip()
+    if not os.path.exists(path):
+        print("Chemin invalide. Veuillez réessayer.")
+        return
+    try:
+        sp.run(["./script_logo_insta.sh", path], check=True)
+    except Exception as e:
+        print(f"Erreur lors de l'ajout du logo : {e}")
 
 
 def adapt_meta_insta():
-    print("\n--- MODIFICATION METADONNÉES ---")
-    print("1- img_to_be_changed/")
-    print("2- img_to_be_changed/changed/")
-    print("3- img_logo/")
-
-    choix = get_user_choice("Chemin: ", [1, 2, 3])
-    paths = {
-        1: "img_to_be_changed/",
-        2: "img_to_be_changed/changed/",
-        3: "img_logo/",
-    }
-
-    sp.run(["./meta_insta.sh", paths[choix]])
+    path = input("Entrez le chemin où sont situées vos photos : ").strip()
+    if not os.path.exists(path):
+        print("Chemin invalide. Veuillez réessayer.")
+        return
+    try:
+        sp.run(["./meta_insta.sh", path], check=True)
+    except Exception as e:
+        print(f"Erreur lors de l'adaptation des métadonnées : {e}")
 
 
 def corrige_inclinaison():
-    print("\n--- CORRECTION INCLINAISON ---")
-    print("1- img_to_be_changed/")
-    print("2- img_to_be_changed/changed/")
-    choix = get_user_choice("Choisissez le dossier: ", [1, 2])
-    path = "img_to_be_changed/" if choix == 1 else "img_to_be_changed/changed/"
-    finale.main.auto_align_roll_for_folder(path)
+    print("\n--- CORRECTION D'INCLINAISON ---")
+    path = input("Entrez le chemin où sont situées vos photos : ").strip()
+    if not os.path.exists(path):
+        print("Chemin invalide. Veuillez réessayer.")
+        return
+    try:
+        finale.main.auto_align_roll_for_folder(path)
+        print("Correction effectuée avec succès.")
+    except Exception as e:
+        print(f"Erreur lors de la correction d'inclinaison : {e}")
 
 
 def mode_auto():
@@ -251,29 +241,35 @@ def mode_auto():
     print("  - Modification des métadonnées (Insta360 uniquement)")
     print("  - Upload vers Panoramax")
 
-    kml_to_geojson.converter_kml()
-    change_gps_2.main()
-    finale.main.auto_align_roll_for_folder("img_to_be_changed/changed/")
-    meta_path = (
-        "img_logo/"
-        if CAMERA == "Insta360 one x2"
-        else f"img_to_be_changed/changed/{finale.constants.CERTAIN_DIR}"
-    )
-    print(
-        "ATTENTION LES IMAGES ETANT CLASSIFIE COMME INCERTAINE NE SERONT PAS TRAITÉ PAR LE TRAITEMENT CONSACRÉ A INSTA360 ET NE SERONS PAS PUSH SUR PANORAMAX"
-    )
-    sp.run(["./meta_insta.sh", meta_path])
-    sp.run(["./script_logo_insta.sh", "img_to_be_changed/changed/"])
+    try:
+        kml_to_geojson.converter_kml()
+        change_gps_2.main()
+        finale.main.auto_align_roll_for_folder("img_to_be_changed/changed/")
+        meta_path = (
+            "img_logo/"
+            if CAMERA == "Insta360 one x2"
+            else f"img_to_be_changed/changed/{finale.constants.CERTAIN_DIR}"
+        )
 
-    sp.run(
-        [
-            "panoramax_cli",
-            "upload",
-            "--api-url",
-            "https://panoramax.openstreetmap.fr/",
-            "img_logo/",
-        ]
-    )
+        print(
+            "ATTENTION LES IMAGES ÉTANT CLASSIFIÉES COMME INCERTAINES "
+            "NE SERONT PAS TRAITÉES PAR LE TRAITEMENT INSTA360 ET NE SERONT PAS PUSH SUR PANORAMAX"
+        )
+
+        sp.run(["./meta_insta.sh", meta_path], check=True)
+        sp.run(["./script_logo_insta.sh", "img_to_be_changed/changed/"], check=True)
+        sp.run(
+            [
+                "panoramax_cli",
+                "upload",
+                "--api-url",
+                "https://panoramax.openstreetmap.fr/",
+                "img_logo/",
+            ],
+            check=True
+        )
+    except Exception as e:
+        print(f"Erreur dans le mode auto : {e}")
 
 
 def mode_auto_vid():
@@ -283,28 +279,31 @@ def mode_auto_vid():
     print("  - Extraction des photos")
     print("  - Changement des coordonnées GPS")
     print("  - Ajout de logo")
-    print("  - Modification des métadonnées (Insta360 uniquement)")
+    print("  - Modification des métadonnées")
     print("  - Upload vers Panoramax")
 
-    img_extractor.extract_all_real_photos("vids/")
-    kml_to_geojson.converter_kml()
-    change_gps_vid.main()
+    try:
+        img_extractor.extract_all_real_photos("vids/")
+        kml_to_geojson.converter_kml()
+        change_gps_vid.main()
 
-    meta_path = (
-        "img_logo/" if CAMERA == "Insta360 one x2" else "img_to_be_changed/changed/"
-    )
-    sp.run(["./meta_insta.sh", meta_path])
-    sp.run(["./script_logo_insta.sh", "img_to_be_changed/changed/"])
-
-    sp.run(
-        [
-            "panoramax_cli",
-            "upload",
-            "--api-url",
-            "https://panoramax.openstreetmap.fr/",
-            "img_logo/",
-        ]
-    )
+        meta_path = (
+            "img_logo/" if CAMERA == "Insta360 one x2" else "img_to_be_changed/changed/"
+        )
+        sp.run(["./meta_insta.sh", meta_path], check=True)
+        sp.run(["./script_logo_insta.sh", "img_to_be_changed/changed/"], check=True)
+        sp.run(
+            [
+                "panoramax_cli",
+                "upload",
+                "--api-url",
+                "https://panoramax.openstreetmap.fr/",
+                "img_logo/",
+            ],
+            check=True
+        )
+    except Exception as e:
+        print(f"Erreur dans le mode auto vidéo : {e}")
 
 
 if __name__ == "__main__":
