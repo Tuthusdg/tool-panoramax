@@ -1,13 +1,13 @@
 import os
 from tqdm import tqdm
-from image_utils import read_image_with_exif, write_image_with_exif
-from constants import (
+from finale.image_utils import read_image_with_exif, write_image_with_exif
+from finale.constants import (
     OUTPUT_DIR,
     SLOPE_ERROR_THRESHOLD,
     CERTAIN_DIR,
     UNCERTAIN_DIR,
 )
-from alignment import binary_search_roll
+from finale.alignment import binary_search_roll
 import csv
 
 

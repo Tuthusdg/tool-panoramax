@@ -115,7 +115,7 @@ def menu_go_pro():
         print("4- Corriger l'inclinaison(v.BETA)")
         print("5- Retour")
         print("6- Quitter")
-        choix = get_user_choice("Votre choix: ", [1, 2, 3, 4, 5])
+        choix = get_user_choice("Votre choix: ", [1, 2, 3, 4, 5, 6])
 
         if choix == 1:
             mode_auto()
@@ -124,7 +124,7 @@ def menu_go_pro():
         elif choix == 3:
             add_logo()
         elif choix == 4:
-            pass
+            corrige_inclinaison()
         elif choix == 5:
             return
         else:
@@ -238,7 +238,7 @@ def corrige_inclinaison():
     print("2- img_to_be_changed/changed/")
     choix = get_user_choice("Choisissez le dossier: ", [1, 2])
     path = "img_to_be_changed/" if choix == 1 else "img_to_be_changed/changed/"
-    finale.main(path)
+    finale.main.auto_align_roll_for_folder(path)
 
 
 def mode_auto():
@@ -253,7 +253,7 @@ def mode_auto():
 
     kml_to_geojson.converter_kml()
     change_gps_2.main()
-    finale.main("img_to_be_changed/changed/")
+    finale.main.auto_align_roll_for_folder("img_to_be_changed/changed/")
     meta_path = (
         "img_logo/"
         if CAMERA == "Insta360 one x2"
