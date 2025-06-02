@@ -1,4 +1,4 @@
 📖 Lire ce projet dans une autre langue :
 
-- [Français](docs/fr/README.md)
-- [English](docs/en/README.md)
+- [Français](docs/README.md.fr)
+- [English](docs/README.md.en)
