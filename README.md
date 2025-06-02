@@ -31,7 +31,7 @@ source tool_panoramax/bin/activate
 ```
 Lancez le script principal :
 ```bash
-    python boite_a_outils.py
+python boite_a_outils.py
 ```
 ## ⚠️ Prérequis
 
