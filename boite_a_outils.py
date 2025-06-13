@@ -222,7 +222,7 @@ def corrige_inclinaison():
         print("Chemin invalide. Veuillez réessayer.")
         return
     try:
-        finale.main.auto_align_roll_for_folder(path)
+        main.auto_align_roll_for_folder(path)
         print("Correction effectuée avec succès.")
     except Exception as e:
         print(f"Erreur lors de la correction d'inclinaison : {e}")
@@ -241,11 +241,11 @@ def mode_auto():
     try:
         kml_to_geojson.converter_kml()
         change_gps_2.main()
-        finale.main.auto_align_roll_for_folder("img_to_be_changed/changed/")
+        main.auto_align_roll_for_folder("img_to_be_changed/changed/")
         meta_path = (
             "img_logo/"
             if CAMERA == "Insta360 one x2"
-            else f"img_to_be_changed/changed/{finale.constants.CERTAIN_DIR}"
+            else f"img_to_be_changed/changed/{constants.CERTAIN_DIR}"
         )
 
         print(
