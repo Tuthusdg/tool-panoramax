@@ -1,13 +1,13 @@
 import os
 from tqdm import tqdm
-from finale.image_utils import read_image_with_exif, write_image_with_exif
-from finale.constants import (
+from scripts.horizon_redressment.image_utils import read_image_with_exif, write_image_with_exif
+from scripts.horizon_redressment.constants import (
     OUTPUT_DIR,
     SLOPE_ERROR_THRESHOLD,
     CERTAIN_DIR,
     UNCERTAIN_DIR,
 )
-from finale.alignment import binary_search_roll
+from scripts.horizon_redressment.alignment import binary_search_roll
 import csv
 
 
