@@ -1,13 +1,10 @@
 import os
 import subprocess as sp
 import sys
-
-import change_gps_2
-import change_gps_vid
-import finale.constants
-import finale.main
-import img_extractor
-import kml_to_geojson
+from scripts.geo_perso import change_gps_2, change_gps_vid
+from scripts.horizon_redressment import constants , main
+from scripts.video import img_extractor
+from scripts.geo_perso import kml_to_geojson 
 
 CAMERA = ""
 
