@@ -199,7 +199,7 @@ def add_logo():
         print("Chemin invalide. Veuillez réessayer.")
         return
     try:
-        sp.run(["./script_logo_insta.sh", path], check=True)
+        sp.run(["./scripts/logo/script_logo_insta.sh", path], check=True)
     except Exception as e:
         print(f"Erreur lors de l'ajout du logo : {e}")
 
@@ -210,7 +210,7 @@ def adapt_meta_insta():
         print("Chemin invalide. Veuillez réessayer.")
         return
     try:
-        sp.run(["./meta_insta.sh", path], check=True)
+        sp.run(["./scripts/insta/meta_insta.sh", path], check=True)
     except Exception as e:
         print(f"Erreur lors de l'adaptation des métadonnées : {e}")
 
@@ -253,8 +253,8 @@ def mode_auto():
             "NE SERONT PAS TRAITÉES PAR LE TRAITEMENT INSTA360 ET NE SERONT PAS PUSH SUR PANORAMAX"
         )
 
-        sp.run(["./meta_insta.sh", meta_path], check=True)
-        sp.run(["./script_logo_insta.sh", "img_to_be_changed/changed/"], check=True)
+        sp.run(["./scripts/insta/meta_insta.sh", meta_path], check=True)
+        sp.run(["./scripts/logo/script_logo_insta.sh", "img_to_be_changed/changed/"], check=True)
         sp.run(
             [
                 "panoramax_cli",
@@ -287,8 +287,8 @@ def mode_auto_vid():
         meta_path = (
             "img_logo/" if CAMERA == "Insta360 one x2" else "img_to_be_changed/changed/"
         )
-        sp.run(["./meta_insta.sh", meta_path], check=True)
-        sp.run(["./script_logo_insta.sh", "img_to_be_changed/changed/"], check=True)
+        sp.run(["./scripts/insta/meta_insta.sh", meta_path], check=True)
+        sp.run(["./scripts/logo/script_logo_insta.sh", "img_to_be_changed/changed/"], check=True)
         sp.run(
             [
                 "panoramax_cli",
@@ -297,6 +297,7 @@ def mode_auto_vid():
                 "https://panoramax.openstreetmap.fr/",
                 "img_logo/",
             ],
+
             check=True
         )
     except Exception as e:
